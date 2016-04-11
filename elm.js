@@ -10344,8 +10344,7 @@ Elm.Main.make = function (_elm) {
    var viewAssignment = F2(function (address,assignment) {
       return A2($Html.tr,
       _U.list([]),
-      _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text($Basics.toString(assignment.id))]))
-              ,A2($Html.td,
+      _U.list([A2($Html.td,
               _U.list([]),
               _U.list([A2($Html.input,
               _U.list([$Html$Attributes.value($Basics.toString(assignment.grade))
@@ -10387,8 +10386,7 @@ Elm.Main.make = function (_elm) {
                       _U.list([]),
                       _U.list([A2($Html.tr,
                       _U.list([]),
-                      _U.list([A2($Html.th,_U.list([]),_U.list([$Html.text("Assignment #")]))
-                              ,A2($Html.th,_U.list([]),_U.list([$Html.text("Grade")]))
+                      _U.list([A2($Html.th,_U.list([]),_U.list([$Html.text("Grade")]))
                               ,A2($Html.th,_U.list([]),_U.list([$Html.text("Weight (Out of 100)")]))]))]))
                       ,A2($Html.tbody,_U.list([]),A2($List.map,viewAssignment(address),model.assignments))]))
               ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Calculate)]),_U.list([$Html.text("Calculate your current grade")]))]));

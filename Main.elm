@@ -111,8 +111,7 @@ view address model =
         , table []
           [ thead []
             [ tr []
-              [ th [] [ text "Assignment #" ]
-              , th [] [ text "Grade" ]
+              [ th [] [ text "Grade" ]
               , th [] [ text "Weight (Out of 100)" ]
               ]
             ]
@@ -125,8 +124,7 @@ view address model =
 viewAssignment: Address Action -> Assignment -> Html
 viewAssignment address assignment =
   tr []
-    [ td [] [ text (toString(assignment.id)) ]
-    , td []
+    [ td []
       [ input
         [ value (toString(assignment.grade))
         , on "blur" targetValue (Signal.message address << UpdateGrade assignment.id)
