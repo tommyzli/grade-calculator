@@ -10373,15 +10373,21 @@ Elm.Main.make = function (_elm) {
    var Add = {ctor: "Add"};
    var view = F2(function (address,model) {
       return A2($Html.div,
-      _U.list([]),
+      _U.list([$Html$Attributes.$class("main")]),
       _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("Grade Calculator")]))
               ,A2($Html.div,
-              _U.list([]),
-              _U.list([$Html.text(A2($Basics._op["++"],"Current Grade: ",A2($Basics._op["++"],$Basics.toString(model.currentGrade),"%")))]))
-              ,A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"Percent of course completed: ",$Basics.toString(model.completedGrade)))]))
+              _U.list([$Html$Attributes.$class("totals")]),
+              _U.list([A2($Html.div,
+                      _U.list([]),
+                      _U.list([$Html.text(A2($Basics._op["++"],"Current Grade: ",A2($Basics._op["++"],$Basics.toString(model.currentGrade),"%")))]))
+                      ,A2($Html.div,
+                      _U.list([]),
+                      _U.list([$Html.text(A2($Basics._op["++"],
+                      "Percent of course completed: ",
+                      A2($Basics._op["++"],$Basics.toString(model.completedGrade),"%")))]))]))
               ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Add)]),_U.list([$Html.text("Add an assignment")]))
               ,A2($Html.table,
-              _U.list([]),
+              _U.list([$Html$Attributes.$class("table")]),
               _U.list([A2($Html.thead,
                       _U.list([]),
                       _U.list([A2($Html.tr,

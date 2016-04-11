@@ -103,12 +103,14 @@ update action model =
 
 view: Address Action -> Model -> Html
 view address model =
-    div []
+    div [ class "main" ]
         [ h1 [] [ text "Grade Calculator" ]
-        , div [] [ text ("Current Grade: " ++ toString(model.currentGrade) ++ "%") ]
-        , div [] [ text ("Percent of course completed: " ++ toString(model.completedGrade)) ]
+        , div [ class "totals" ]
+            [ div [] [ text ("Current Grade: " ++ toString(model.currentGrade) ++ "%") ]
+            , div [] [ text ("Percent of course completed: " ++ toString(model.completedGrade) ++ "%") ]
+            ]
         , button [ onClick address Add ] [ text "Add an assignment"]
-        , table []
+        , table [ class "table" ]
           [ thead []
             [ tr []
               [ th [] [ text "Grade" ]
