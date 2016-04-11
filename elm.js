@@ -10334,8 +10334,10 @@ Elm.Main.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $StartApp$Simple = Elm.StartApp.Simple.make(_elm);
+   $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
+   $String = Elm.String.make(_elm);
    var _op = {};
+   var UpdateWeight = F2(function (a,b) {    return {ctor: "UpdateWeight",_0: a,_1: b};});
    var UpdateGrade = F2(function (a,b) {    return {ctor: "UpdateGrade",_0: a,_1: b};});
    var Calculate = {ctor: "Calculate"};
    var Delete = function (a) {    return {ctor: "Delete",_0: a};};
@@ -10343,8 +10345,28 @@ Elm.Main.make = function (_elm) {
       return A2($Html.tr,
       _U.list([]),
       _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text($Basics.toString(assignment.id))]))
-              ,A2($Html.td,_U.list([]),_U.list([A2($Html.input,_U.list([$Html$Attributes.value($Basics.toString(assignment.grade))]),_U.list([]))]))
-              ,A2($Html.td,_U.list([]),_U.list([A2($Html.input,_U.list([$Html$Attributes.value($Basics.toString(assignment.weight))]),_U.list([]))]))
+              ,A2($Html.td,
+              _U.list([]),
+              _U.list([A2($Html.input,
+              _U.list([$Html$Attributes.value($Basics.toString(assignment.grade))
+                      ,A3($Html$Events.on,
+                      "blur",
+                      $Html$Events.targetValue,
+                      function (_p0) {
+                         return A2($Signal.message,address,A2(UpdateGrade,assignment.id,_p0));
+                      })]),
+              _U.list([]))]))
+              ,A2($Html.td,
+              _U.list([]),
+              _U.list([A2($Html.input,
+              _U.list([$Html$Attributes.value($Basics.toString(assignment.weight))
+                      ,A3($Html$Events.on,
+                      "blur",
+                      $Html$Events.targetValue,
+                      function (_p1) {
+                         return A2($Signal.message,address,A2(UpdateWeight,assignment.id,_p1));
+                      })]),
+              _U.list([]))]))
               ,A2($Html.td,
               _U.list([]),
               _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,Delete(assignment.id))]),_U.list([$Html.text("Remove")]))]))]));
@@ -10354,9 +10376,10 @@ Elm.Main.make = function (_elm) {
       return A2($Html.div,
       _U.list([]),
       _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("Grade Calculator")]))
-              ,A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"uid: ",$Basics.toString(model.uid)))]))
-              ,A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"current grade: ",$Basics.toString(model.currentGrade)))]))
-              ,A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"percent of course completed: ",$Basics.toString(model.completedGrade)))]))
+              ,A2($Html.div,
+              _U.list([]),
+              _U.list([$Html.text(A2($Basics._op["++"],"Current Grade: ",A2($Basics._op["++"],$Basics.toString(model.currentGrade),"%")))]))
+              ,A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"Percent of course completed: ",$Basics.toString(model.completedGrade)))]))
               ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Add)]),_U.list([$Html.text("Add an assignment")]))
               ,A2($Html.table,
               _U.list([]),
@@ -10371,19 +10394,42 @@ Elm.Main.make = function (_elm) {
               ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Calculate)]),_U.list([$Html.text("Calculate your current grade")]))]));
    });
    var NoOp = {ctor: "NoOp"};
-   var emptyModel = {assignments: _U.list([]),uid: 1,currentGrade: 0.0,completedGrade: 0.0};
+   var emptyModel = {assignments: _U.list([{grade: 0.0,weight: 0.0,id: 1}]),uid: 2,currentGrade: 0.0,completedGrade: 0.0};
    var newAssignment = F2(function (name,id) {    return {grade: 0.0,weight: 0.0,id: id};});
    var update = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
+      var _p2 = action;
+      switch (_p2.ctor)
       {case "NoOp": return model;
          case "Add": return _U.update(model,
            {uid: model.uid + 1,assignments: A2($Basics._op["++"],model.assignments,_U.list([A2(newAssignment,"",model.uid)]))});
-         case "Delete": return _U.update(model,{assignments: A2($List.filter,function (a) {    return !_U.eq(a.id,_p0._0);},model.assignments)});
+         case "Delete": return _U.update(model,{assignments: A2($List.filter,function (a) {    return !_U.eq(a.id,_p2._0);},model.assignments)});
          case "Calculate": return _U.update(model,
-           {currentGrade: A3($List.foldr,F2(function (a,sum) {    return sum + a.grade / 100 * a.weight;}),0.0,model.assignments)
+           {currentGrade: A3($List.foldr,F2(function (a,sum) {    return sum + a.grade / 100 * a.weight;}),0.0,model.assignments) / model.completedGrade * 100
            ,completedGrade: A3($List.foldr,F2(function (a,sum) {    return sum + a.weight;}),0.0,model.assignments)});
-         default: return model;}
+         case "UpdateGrade": var updateGrade = function (a) {
+              return _U.eq(a.id,_p2._0) ? _U.update(a,
+              {grade: function () {
+                 var _p3 = $String.toFloat(_p2._1);
+                 if (_p3.ctor === "Err") {
+                       return 0.0;
+                    } else {
+                       return _p3._0;
+                    }
+              }()}) : a;
+           };
+           return _U.update(model,{assignments: A2($List.map,updateGrade,model.assignments)});
+         default: var updateWeight = function (a) {
+              return _U.eq(a.id,_p2._0) ? _U.update(a,
+              {weight: function () {
+                 var _p4 = $String.toFloat(_p2._1);
+                 if (_p4.ctor === "Err") {
+                       return 0.0;
+                    } else {
+                       return _p4._0;
+                    }
+              }()}) : a;
+           };
+           return _U.update(model,{assignments: A2($List.map,updateWeight,model.assignments)});}
    });
    var main = $StartApp$Simple.start({model: emptyModel,view: view,update: update});
    var Assignment = F3(function (a,b,c) {    return {grade: a,weight: b,id: c};});
@@ -10398,6 +10444,7 @@ Elm.Main.make = function (_elm) {
                              ,Delete: Delete
                              ,Calculate: Calculate
                              ,UpdateGrade: UpdateGrade
+                             ,UpdateWeight: UpdateWeight
                              ,update: update
                              ,view: view
                              ,viewAssignment: viewAssignment

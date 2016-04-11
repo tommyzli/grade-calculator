@@ -2,7 +2,8 @@ module Main where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (on, onClick, targetValue)
+import String
 import Signal exposing (Signal, Address)
 import StartApp.Simple as StartApp
 
@@ -33,8 +34,13 @@ newAssignment name id =
 
 emptyModel: Model
 emptyModel =
-    { assignments = []
-    , uid = 1
+    { assignments = [
+        { grade = 0.0
+        , weight = 0.0
+        , id = 1
+        }
+    ]
+    , uid = 2
     , currentGrade = 0.0
     , completedGrade = 0.0
     }
@@ -47,7 +53,8 @@ type Action
     | Add
     | Delete Int
     | Calculate
-    | UpdateGrade Float Int
+    | UpdateGrade Int String
+    | UpdateWeight Int String
 
 update: Action -> Model -> Model
 update action model =
@@ -63,11 +70,33 @@ update action model =
         Delete id -> { model | assignments =  List.filter (\a -> a.id /= id) model.assignments }
 
         Calculate -> { model
-            | currentGrade = List.foldr (\a sum -> sum + ( a.grade / 100 * a.weight )) 0.0 model.assignments
+            | currentGrade = (List.foldr (\a sum -> sum + ( a.grade / 100 * a.weight )) 0.0 model.assignments) / model.completedGrade * 100
             , completedGrade = List.foldr (\a sum -> sum + a.weight ) 0.0 model.assignments
             }
 
-        UpdateGrade grade id -> model
+        UpdateGrade id grade ->
+            let updateGrade a =
+                if a.id == id
+                then
+                    { a | grade =
+                        case (String.toFloat grade) of
+                            Err str -> 0.0
+                            Ok g -> g
+                        } else a
+            in
+                { model | assignments = List.map updateGrade model.assignments }
+
+        UpdateWeight id weight ->
+            let updateWeight a =
+                if a.id == id
+                then
+                    { a | weight =
+                        case (String.toFloat weight) of
+                            Err str -> 0.0
+                            Ok w -> w
+                        } else a
+            in
+                { model | assignments = List.map updateWeight model.assignments }
 
 
 ---- VIEW ----
@@ -76,9 +105,8 @@ view: Address Action -> Model -> Html
 view address model =
     div []
         [ h1 [] [ text "Grade Calculator" ]
-        , div [] [ text ("uid: " ++ toString(model.uid)) ]
-        , div [] [ text ("current grade: " ++ toString(model.currentGrade)) ]
-        , div [] [ text ("percent of course completed: " ++ toString(model.completedGrade)) ]
+        , div [] [ text ("Current Grade: " ++ toString(model.currentGrade) ++ "%") ]
+        , div [] [ text ("Percent of course completed: " ++ toString(model.completedGrade)) ]
         , button [ onClick address Add ] [ text "Add an assignment"]
         , table []
           [ thead []
@@ -101,11 +129,13 @@ viewAssignment address assignment =
     , td []
       [ input
         [ value (toString(assignment.grade))
+        , on "blur" targetValue (Signal.message address << UpdateGrade assignment.id)
         ]
         [] ]
     , td []
       [ input
         [ value (toString(assignment.weight))
+        , on "blur" targetValue (Signal.message address << UpdateWeight assignment.id)
         ]
         [] ]
     , td [] [ button [ onClick address (Delete assignment.id) ] [ text "Remove" ] ]
