@@ -18,28 +18,23 @@ type alias Model =
     }
 
 type alias Assignment =
-    { grade: Float
-    , weight: Float
+    { grade: String
+    , weight: String
     , id: Int
     }
 
 
-newAssignment: String -> Int -> Assignment
-newAssignment name id =
-    { grade = 0.0
-    , weight = 0.0
+newAssignment: Int -> Assignment
+newAssignment id =
+    { grade = "0.0"
+    , weight = "0.0"
     , id = id
     }
 
 
 emptyModel: Model
 emptyModel =
-    { assignments = [
-        { grade = 0.0
-        , weight = 0.0
-        , id = 1
-        }
-    ]
+    { assignments = [newAssignment 1]
     , uid = 2
     , currentGrade = 0.0
     , completedGrade = 0.0
@@ -64,37 +59,37 @@ update action model =
         Add ->
             { model
                 | uid = model.uid + 1
-                , assignments = model.assignments ++ [newAssignment "" model.uid]
+                , assignments = model.assignments ++ [newAssignment model.uid]
                 }
 
         Delete id -> { model | assignments =  List.filter (\a -> a.id /= id) model.assignments }
 
-        Calculate -> { model
-            | currentGrade = (List.foldr (\a sum -> sum + ( a.grade / 100 * a.weight )) 0.0 model.assignments) / model.completedGrade * 100
-            , completedGrade = List.foldr (\a sum -> sum + a.weight ) 0.0 model.assignments
-            }
+        Calculate ->
+            let
+                toFloat num =
+                    case (String.toFloat num) of
+                        Err str -> 0.0
+                        Ok n -> n
+                calculateSum assignment sum =
+                    sum + (toFloat assignment.grade / 100 * toFloat assignment.weight)
+            in { model
+                | currentGrade = (List.foldr calculateSum 0.0 model.assignments) / model.completedGrade * 100
+                , completedGrade = List.foldr (\a sum -> sum + toFloat a.weight) 0.0 model.assignments
+                }
 
         UpdateGrade id grade ->
             let updateGrade a =
                 if a.id == id
-                then
-                    { a | grade =
-                        case (String.toFloat grade) of
-                            Err str -> 0.0
-                            Ok g -> g
-                        } else a
+                then { a | grade = grade }
+                else a
             in
                 { model | assignments = List.map updateGrade model.assignments }
 
         UpdateWeight id weight ->
             let updateWeight a =
                 if a.id == id
-                then
-                    { a | weight =
-                        case (String.toFloat weight) of
-                            Err str -> 0.0
-                            Ok w -> w
-                        } else a
+                then { a | weight = weight }
+                else a
             in
                 { model | assignments = List.map updateWeight model.assignments }
 
@@ -128,14 +123,14 @@ viewAssignment address assignment =
   tr []
     [ td []
       [ input
-        [ value (toString(assignment.grade))
-        , on "blur" targetValue (Signal.message address << UpdateGrade assignment.id)
+        [ value (assignment.grade)
+        , on "input" targetValue (Signal.message address << UpdateGrade assignment.id)
         ]
         [] ]
     , td []
       [ input
-        [ value (toString(assignment.weight))
-        , on "blur" targetValue (Signal.message address << UpdateWeight assignment.id)
+        [ value (assignment.weight)
+        , on "input" targetValue (Signal.message address << UpdateWeight assignment.id)
         ]
         [] ]
     , td [] [ button [ onClick address (Delete assignment.id) ] [ text "Remove" ] ]
