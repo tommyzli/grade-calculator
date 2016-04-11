@@ -1,6 +1,8 @@
 ## Grade Calculator
 
-set up:
+[Try it out](https://tommyzli.github.io/grade-calculator/)
+
+Set up locally:
  - `elm-package install`
- - `elm-make Main.elm --output=elm.js`
  - `elm-reactor`
+ - `localhost:8000/Main.elm`
