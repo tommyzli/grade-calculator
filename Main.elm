@@ -50,6 +50,11 @@ type Msg
     | UpdateGrade Int String
     | UpdateWeight Int String
 
+toFloat num =
+    case (String.toFloat num) of
+        Err str -> 0.0
+        Ok n -> n
+
 update: Msg -> Model -> Model
 update msg model =
     case msg of
@@ -65,10 +70,6 @@ update msg model =
 
         Calculate ->
             let
-                toFloat num =
-                    case (String.toFloat num) of
-                        Err str -> 0.0
-                        Ok n -> n
                 calculateSum assignment sum =
                     sum + (toFloat assignment.grade / 100 * toFloat assignment.weight)
             in { model
@@ -129,7 +130,7 @@ viewAssignment assignment =
     , td []
       [ input
         [ value (assignment.weight)
-        , onInput (UpdateWeigh assignment.id)
+        , onInput (UpdateWeight assignment.id)
         ]
         [] ]
     , td [] [ button [ onClick (Delete assignment.id) ] [ text "Remove" ] ]
