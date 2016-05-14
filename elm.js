@@ -7192,8 +7192,16 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _tommyzli$project$Main$toFloat = function (num) {
+	var _p0 = _elm_lang$core$String$toFloat(num);
+	if (_p0.ctor === 'Err') {
+		return 0.0;
+	} else {
+		return _p0._0;
+	}
+};
 var _tommyzli$project$Main$newAssignment = function (id) {
-	return {grade: '0.0', weight: '0.0', id: id};
+	return {grade: '', weight: '', id: id};
 };
 var _tommyzli$project$Main$emptyModel = {
 	assignments: _elm_lang$core$Native_List.fromArray(
@@ -7206,8 +7214,8 @@ var _tommyzli$project$Main$emptyModel = {
 };
 var _tommyzli$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'NoOp':
 				return model;
 			case 'Add':
@@ -7230,22 +7238,14 @@ var _tommyzli$project$Main$update = F2(
 						assignments: A2(
 							_elm_lang$core$List$filter,
 							function (a) {
-								return !_elm_lang$core$Native_Utils.eq(a.id, _p0._0);
+								return !_elm_lang$core$Native_Utils.eq(a.id, _p1._0);
 							},
 							model.assignments)
 					});
 			case 'Calculate':
-				var toFloat = function (num) {
-					var _p1 = _elm_lang$core$String$toFloat(num);
-					if (_p1.ctor === 'Err') {
-						return 0.0;
-					} else {
-						return _p1._0;
-					}
-				};
 				var calculateSum = F2(
 					function (assignment, sum) {
-						return sum + ((toFloat(assignment.grade) / 100) * toFloat(assignment.weight));
+						return sum + ((_tommyzli$project$Main$toFloat(assignment.grade) / 100) * _tommyzli$project$Main$toFloat(assignment.weight));
 					});
 				return _elm_lang$core$Native_Utils.update(
 					model,
@@ -7255,16 +7255,16 @@ var _tommyzli$project$Main$update = F2(
 							_elm_lang$core$List$foldr,
 							F2(
 								function (a, sum) {
-									return sum + toFloat(a.weight);
+									return sum + _tommyzli$project$Main$toFloat(a.weight);
 								}),
 							0.0,
 							model.assignments)
 					});
 			case 'UpdateGrade':
 				var updateGrade = function (a) {
-					return _elm_lang$core$Native_Utils.eq(a.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
+					return _elm_lang$core$Native_Utils.eq(a.id, _p1._0) ? _elm_lang$core$Native_Utils.update(
 						a,
-						{grade: _p0._1}) : a;
+						{grade: _p1._1}) : a;
 				};
 				return _elm_lang$core$Native_Utils.update(
 					model,
@@ -7273,9 +7273,9 @@ var _tommyzli$project$Main$update = F2(
 					});
 			default:
 				var updateWeight = function (a) {
-					return _elm_lang$core$Native_Utils.eq(a.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
+					return _elm_lang$core$Native_Utils.eq(a.id, _p1._0) ? _elm_lang$core$Native_Utils.update(
 						a,
-						{weight: _p0._1}) : a;
+						{weight: _p1._1}) : a;
 				};
 				return _elm_lang$core$Native_Utils.update(
 					model,
