@@ -25,8 +25,8 @@ type alias Assignment =
 
 newAssignment: Int -> Assignment
 newAssignment id =
-    { grade = "0.0"
-    , weight = "0.0"
+    { grade = ""
+    , weight = ""
     , id = id
     }
 
@@ -129,7 +129,7 @@ viewAssignment assignment =
     , td []
       [ input
         [ value (assignment.weight)
-        , onInput (UpdateWeight assignment.id)
+        , onInput (UpdateWeigh assignment.id)
         ]
         [] ]
     , td [] [ button [ onClick (Delete assignment.id) ] [ text "Remove" ] ]
