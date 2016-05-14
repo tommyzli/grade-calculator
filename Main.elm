@@ -1,11 +1,10 @@
-module Main where
+module Main exposing (..)
 
 import Html exposing (..)
+import Html.App as StartApp
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onClick, targetValue)
+import Html.Events exposing (on, onClick, onInput, targetValue)
 import String
-import Signal exposing (Signal, Address)
-import StartApp.Simple as StartApp
 
 
 ---- MODEL ----
@@ -43,7 +42,7 @@ emptyModel =
 
 ---- UPDATE ----
 
-type Action
+type Msg
     = NoOp
     | Add
     | Delete Int
@@ -51,9 +50,9 @@ type Action
     | UpdateGrade Int String
     | UpdateWeight Int String
 
-update: Action -> Model -> Model
-update action model =
-    case action of
+update: Msg -> Model -> Model
+update msg model =
+    case msg of
         NoOp -> model
 
         Add ->
@@ -96,15 +95,15 @@ update action model =
 
 ---- VIEW ----
 
-view: Address Action -> Model -> Html
-view address model =
+view: Model -> Html Msg
+view model =
     div [ class "main" ]
         [ h1 [] [ text "Grade Calculator" ]
         , div [ class "totals" ]
             [ div [] [ text ("Current Grade: " ++ toString(model.currentGrade) ++ "%") ]
             , div [] [ text ("Percent of course completed: " ++ toString(model.completedGrade) ++ "%") ]
             ]
-        , button [ onClick address Add ] [ text "Add an assignment"]
+        , button [ onClick Add ] [ text "Add an assignment"]
         , table [ class "table" ]
           [ thead []
             [ tr []
@@ -113,28 +112,28 @@ view address model =
               ]
             ]
           , tbody []
-            (List.map (viewAssignment address) model.assignments)
+            (List.map viewAssignment model.assignments)
           ]
-        , button [ onClick address Calculate ] [ text "Calculate your current grade" ]
+        , button [ onClick Calculate ] [ text "Calculate your current grade" ]
         ]
 
-viewAssignment: Address Action -> Assignment -> Html
-viewAssignment address assignment =
+viewAssignment: Assignment -> Html Msg
+viewAssignment assignment =
   tr []
     [ td []
       [ input
         [ value (assignment.grade)
-        , on "input" targetValue (Signal.message address << UpdateGrade assignment.id)
+        , onInput (UpdateGrade assignment.id)
         ]
         [] ]
     , td []
       [ input
         [ value (assignment.weight)
-        , on "input" targetValue (Signal.message address << UpdateWeight assignment.id)
+        , onInput (UpdateWeight assignment.id)
         ]
         [] ]
-    , td [] [ button [ onClick address (Delete assignment.id) ] [ text "Remove" ] ]
+    , td [] [ button [ onClick (Delete assignment.id) ] [ text "Remove" ] ]
     ]
 
 
-main = StartApp.start { model = emptyModel, view = view, update = update }
+main = StartApp.beginnerProgram { model = emptyModel, view = view, update = update }
